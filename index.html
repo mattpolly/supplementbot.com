@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SupplementBot — Intake</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h1>SupplementBot</h1>
+            <div id="phase-indicator" class="phase"></div>
+        </header>
+
+        <div id="disclaimer">
+            This is not medical advice. Supplements are not a substitute for
+            professional medical care. Please consult a healthcare provider
+            before starting any supplement regimen.
+        </div>
+
+        <div id="chat-container">
+            <div id="messages"></div>
+            <div id="typing-indicator" class="hidden">
+                <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            </div>
+        </div>
+
+        <div id="emergency-block" class="hidden">
+            <h2>Please seek immediate help</h2>
+            <p><strong>Emergency:</strong> Call <a href="tel:911">911</a></p>
+            <p><strong>Crisis Hotline:</strong> Call or text <a href="tel:988">988</a></p>
+            <p><strong>Crisis Text Line:</strong> Text HOME to 741741</p>
+            <p>If you are experiencing a medical emergency, please contact
+               emergency services immediately.</p>
+        </div>
+
+        <div id="denied-block" class="hidden">
+            <p id="denied-message"></p>
+        </div>
+
+        <form id="input-form">
+            <input type="text" id="user-input" placeholder="Type your message..."
+                   autocomplete="off" autofocus>
+            <button type="submit" id="send-btn">Send</button>
+        </form>
+    </div>
+
+    <script src="chat.js"></script>
+</body>
+</html>

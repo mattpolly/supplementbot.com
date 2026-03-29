@@ -1,0 +1,211 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #f5f5f5;
+    color: #333;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#app {
+    width: 100%;
+    max-width: 640px;
+    height: 100vh;
+    max-height: 800px;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+/* Header */
+header {
+    padding: 16px 20px;
+    background: #2c5f2d;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+header h1 {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.phase {
+    font-size: 12px;
+    background: rgba(255,255,255,0.2);
+    padding: 4px 10px;
+    border-radius: 12px;
+    text-transform: capitalize;
+}
+
+/* Disclaimer banner — always visible, UI-level, not LLM-generated */
+#disclaimer {
+    padding: 10px 20px;
+    background: #fff3cd;
+    color: #856404;
+    font-size: 12px;
+    line-height: 1.4;
+    border-bottom: 1px solid #ffc107;
+}
+
+/* Chat container */
+#chat-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Message bubbles */
+.message {
+    max-width: 85%;
+    padding: 10px 14px;
+    border-radius: 16px;
+    line-height: 1.5;
+    font-size: 14px;
+    word-wrap: break-word;
+    animation: fadeIn 0.2s ease;
+}
+
+.message.agent {
+    background: #e8f5e9;
+    color: #1b5e20;
+    align-self: flex-start;
+    border-bottom-left-radius: 4px;
+}
+
+.message.user {
+    background: #2c5f2d;
+    color: #fff;
+    align-self: flex-end;
+    border-bottom-right-radius: 4px;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Typing indicator */
+#typing-indicator {
+    display: flex;
+    gap: 4px;
+    padding: 10px 14px;
+    align-self: flex-start;
+}
+
+#typing-indicator .dot {
+    width: 8px;
+    height: 8px;
+    background: #aaa;
+    border-radius: 50%;
+    animation: bounce 1.2s infinite;
+}
+
+#typing-indicator .dot:nth-child(2) { animation-delay: 0.2s; }
+#typing-indicator .dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes bounce {
+    0%, 60%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-6px); }
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Emergency block */
+#emergency-block {
+    padding: 24px 20px;
+    background: #f44336;
+    color: #fff;
+    text-align: center;
+}
+
+#emergency-block h2 {
+    margin-bottom: 12px;
+}
+
+#emergency-block p {
+    margin: 8px 0;
+    font-size: 16px;
+}
+
+#emergency-block a {
+    color: #fff;
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+/* Denied block */
+#denied-block {
+    padding: 40px 20px;
+    text-align: center;
+    color: #666;
+    font-size: 16px;
+}
+
+/* Input form */
+#input-form {
+    display: flex;
+    padding: 12px 16px;
+    border-top: 1px solid #e0e0e0;
+    background: #fafafa;
+    gap: 8px;
+}
+
+#user-input {
+    flex: 1;
+    padding: 10px 14px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+#user-input:focus {
+    border-color: #2c5f2d;
+}
+
+#send-btn {
+    padding: 10px 20px;
+    background: #2c5f2d;
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+#send-btn:hover {
+    background: #1e4620;
+}
+
+#send-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    #app {
+        max-height: 100vh;
+        border-radius: 0;
+    }
+}
