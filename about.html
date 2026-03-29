@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About — SupplementBot</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="site-nav">
+        <a href="/" class="nav-brand">SupplementBot</a>
+        <div class="nav-links">
+            <a href="/about.html" class="active">About</a>
+        </div>
+    </nav>
+
+    <main class="about-page">
+
+        <section class="about-hero">
+            <h1>How SupplementBot works</h1>
+            <p>SupplementBot is a neurosymbolic AI system — it combines a large language model with a typed knowledge graph to give you structured, auditable answers about supplement science, not hallucinated guesses.</p>
+        </section>
+
+        <section class="about-section">
+            <h2>Two layers, working together</h2>
+            <div class="two-col">
+                <div class="col-card">
+                    <h3>Knowledge graph</h3>
+                    <p>Before any conversation begins, a separate NSAI loop teaches the system about supplements. It queries multiple LLMs (Anthropic, Google Gemini, xAI Grok), extracts typed triples, and assembles them into a persistent graph stored in SurrealDB.</p>
+                    <p>The graph has 14 node types and 19 edge types across three complexity tiers — from foundational (body systems, symptoms) to graduate-level (gene targets, receptors, metabolites). A continuous <strong>complexity lens</strong> controls which parts of the graph are visible, so explanations scale to what's useful, not what's technically complete.</p>
+                    <p>Knowledge comes from <strong>iDISK 2.0</strong> — 392 symptoms, 7,876 ingredients, 214 drugs — cross-validated with SuppKG. Every extracted edge carries a confidence score, a source quality tier (single-provider → multi-provider → citation-backed), and a reasoning depth. Weak edges decay over time. Edges confirmed by multiple independent providers are boosted.</p>
+                </div>
+                <div class="col-card">
+                    <h3>Intake conversation</h3>
+                    <p>The conversation is a structured clinical interview — not a chatbot. It moves through six phases driven by an <strong>intake knowledge graph</strong> (process knowledge separate from supplement facts):</p>
+                    <ol class="phase-list">
+                        <li><strong>Chief Complaint</strong> — what brought you here</li>
+                        <li><strong>HPI</strong> — onset, location, duration, character, severity (OLDCARTS framework)</li>
+                        <li><strong>Review of Systems</strong> — adjacent body systems</li>
+                        <li><strong>Differentiation</strong> — discriminating between top candidates</li>
+                        <li><strong>Causation Inquiry</strong> — checking current supplements for adverse reactions</li>
+                        <li><strong>Recommendation</strong> — ranked supplements with evidence and safety caveats</li>
+                    </ol>
+                    <p>Each question is chosen by <strong>Expected Information Gain</strong> scoring against the current candidate set. The system doesn't ask the same question twice, and it won't ask about a body system you've already addressed.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="about-section">
+            <h2>What happens during your session</h2>
+            <div class="pipeline">
+                <div class="pipeline-step">
+                    <span class="step-num">1</span>
+                    <div>
+                        <strong>Safety check</strong>
+                        <p>Your message is scanned for red flags before any LLM sees it. If emergency keywords are detected, the session ends immediately and you're directed to emergency services.</p>
+                    </div>
+                </div>
+                <div class="pipeline-step">
+                    <span class="step-num">2</span>
+                    <div>
+                        <strong>Extraction</strong>
+                        <p>A cheap, fast model pulls structured data from your message: symptoms, body systems, OLDCARTS dimensions, medications, and corrections. This structured signal — not your raw text — drives the graph queries.</p>
+                    </div>
+                </div>
+                <div class="pipeline-step">
+                    <span class="step-num">3</span>
+                    <div>
+                        <strong>Graph query</strong>
+                        <p>Your symptoms map to nodes in the knowledge graph. The intake engine selects the next question and runs graph actions against the supplement KG and iDISK — scoring candidates by how well their known mechanisms match your symptom profile.</p>
+                    </div>
+                </div>
+                <div class="pipeline-step">
+                    <span class="step-num">4</span>
+                    <div>
+                        <strong>Rendering</strong>
+                        <p>A renderer LLM (Claude) turns the structured context — question template, graph results, candidate list — into a natural response. It never has access to raw graph data or makes clinical claims directly.</p>
+                    </div>
+                </div>
+                <div class="pipeline-step">
+                    <span class="step-num">5</span>
+                    <div>
+                        <strong>Post-generation safety filter</strong>
+                        <p>Every response is checked before it reaches you. Responses containing diagnostic language, cure claims, or medical advice are rewritten or blocked. This filter runs on every turn, independent of the LLM.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="about-section about-limits">
+            <h2>Capacity limits</h2>
+            <p>SupplementBot runs on a single small server and calls commercial LLM APIs on every turn. Each full session costs real money in API fees. To keep the service available without requiring accounts or payment, sessions are capped:</p>
+            <div class="limits-grid">
+                <div class="limit-card">
+                    <span class="limit-num">5</span>
+                    <span class="limit-label">concurrent sessions</span>
+                </div>
+                <div class="limit-card">
+                    <span class="limit-num">13</span>
+                    <span class="limit-label">sessions per day</span>
+                </div>
+                <div class="limit-card">
+                    <span class="limit-num">400</span>
+                    <span class="limit-label">sessions per month</span>
+                </div>
+            </div>
+            <p>If you hit a limit, you'll see a message explaining why — not a generic error. Sessions that are idle for 15 minutes expire automatically to free capacity.</p>
+            <p>These numbers reflect what we can absorb in API costs while the project is in early development. They'll go up as the project matures.</p>
+        </section>
+
+        <section class="about-section">
+            <h2>What SupplementBot will not do</h2>
+            <ul class="constraints-list">
+                <li>It will not diagnose any condition.</li>
+                <li>It will not use the word "cure."</li>
+                <li>It will not recommend supplements for medical conditions — only for symptoms and the body systems where those symptoms present.</li>
+                <li>It will not tell you to stop taking medications.</li>
+                <li>If you describe an emergency, it stops and directs you to 911 or 988.</li>
+            </ul>
+            <p>All language is framed around symptoms and body systems. This is a legal and ethical constraint built into every layer of the system.</p>
+        </section>
+
+        <div class="about-cta">
+            <a href="/" class="cta-btn">Start a session</a>
+        </div>
+
+    </main>
+
+    <footer class="site-footer">
+        <p>SupplementBot is an experimental research project. Not a medical device. Not FDA-evaluated.</p>
+    </footer>
+</body>
+</html>

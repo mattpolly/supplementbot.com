@@ -3,48 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SupplementBot — Intake</title>
+    <title>SupplementBot — Symptom-Guided Supplement Intake</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="app">
-        <header>
-            <h1>SupplementBot</h1>
-            <div id="phase-indicator" class="phase"></div>
-        </header>
+    <nav class="site-nav">
+        <a href="/" class="nav-brand">SupplementBot</a>
+        <div class="nav-links">
+            <a href="/about.html">About</a>
+        </div>
+    </nav>
 
-        <div id="disclaimer">
-            This is not medical advice. Supplements are not a substitute for
-            professional medical care. Please consult a healthcare provider
-            before starting any supplement regimen.
+    <main class="chat-page">
+        <div class="chat-intro">
+            <h1>Find supplements for your symptoms</h1>
+            <p>A clinical-style conversation that narrows from what you're feeling to what may help — backed by a structured knowledge graph, not a language model guessing.</p>
         </div>
 
-        <div id="chat-container">
-            <div id="messages"></div>
-            <div id="typing-indicator" class="hidden">
-                <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        <div id="app">
+            <div id="app-header">
+                <div id="phase-indicator" class="phase"></div>
             </div>
-        </div>
 
-        <div id="emergency-block" class="hidden">
-            <h2>Please seek immediate help</h2>
-            <p><strong>Emergency:</strong> Call <a href="tel:911">911</a></p>
-            <p><strong>Crisis Hotline:</strong> Call or text <a href="tel:988">988</a></p>
-            <p><strong>Crisis Text Line:</strong> Text HOME to 741741</p>
-            <p>If you are experiencing a medical emergency, please contact
-               emergency services immediately.</p>
-        </div>
+            <div id="disclaimer">
+                This is not medical advice. Supplements are not a substitute for
+                professional medical care. Please consult a healthcare provider
+                before starting any supplement regimen.
+            </div>
 
-        <div id="denied-block" class="hidden">
-            <p id="denied-message"></p>
-        </div>
+            <div id="chat-container">
+                <div id="messages"></div>
+                <div id="typing-indicator" class="hidden">
+                    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                </div>
+            </div>
 
-        <form id="input-form">
-            <input type="text" id="user-input" placeholder="Type your message..."
-                   autocomplete="off" autofocus>
-            <button type="submit" id="send-btn">Send</button>
-        </form>
-    </div>
+            <div id="emergency-block" class="hidden">
+                <h2>Please seek immediate help</h2>
+                <p><strong>Emergency:</strong> Call <a href="tel:911">911</a></p>
+                <p><strong>Crisis Hotline:</strong> Call or text <a href="tel:988">988</a></p>
+                <p><strong>Crisis Text Line:</strong> Text HOME to 741741</p>
+                <p>If you are experiencing a medical emergency, please contact
+                   emergency services immediately.</p>
+            </div>
+
+            <div id="denied-block" class="hidden">
+                <p id="denied-message"></p>
+            </div>
+
+            <form id="input-form">
+                <input type="text" id="user-input" placeholder="Describe what you're experiencing..."
+                       autocomplete="off" autofocus>
+                <button type="submit" id="send-btn">Send</button>
+            </form>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <p>SupplementBot is an experimental research project. Session capacity is limited. <a href="/about.html">Learn more.</a></p>
+    </footer>
 
     <script src="chat.js"></script>
 </body>
