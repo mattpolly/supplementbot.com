@@ -74,7 +74,8 @@ function handleServerMessage(msg) {
             break;
 
         case 'denied':
-            deniedMsg.textContent = msg.message;
+            deniedMsg.innerHTML = msg.message
+                + ' <a href="/about.html#capacity">See why &rarr;</a>';
             deniedEl.classList.remove('hidden');
             inputForm.classList.add('hidden');
             break;
@@ -124,16 +125,26 @@ function hideTyping() {
     typingEl.classList.add('hidden');
 }
 
+const PHASES = [
+    { key: 'chief_complaint',   label: 'Chief Complaint' },
+    { key: 'hpi',               label: 'History' },
+    { key: 'review_of_systems', label: 'Review of Systems' },
+    { key: 'differentiation',   label: 'Narrowing Down' },
+    { key: 'causation_inquiry', label: 'Causation Check' },
+    { key: 'recommendation',    label: 'Recommendations' },
+];
+
 function updatePhase(phase) {
-    const labels = {
-        chief_complaint: 'Chief Complaint',
-        hpi: 'History',
-        review_of_systems: 'Review of Systems',
-        differentiation: 'Narrowing Down',
-        recommendation: 'Recommendations',
-        emergency: 'Emergency'
-    };
-    phaseEl.textContent = labels[phase] || phase;
+    if (phase === 'emergency') {
+        phaseEl.textContent = 'Emergency';
+        return;
+    }
+    const idx = PHASES.findIndex(p => p.key === phase);
+    if (idx === -1) {
+        phaseEl.textContent = phase;
+        return;
+    }
+    phaseEl.textContent = `Step ${idx + 1} of ${PHASES.length} — ${PHASES[idx].label}`;
 }
 
 function scrollToBottom() {
@@ -168,4 +179,5 @@ inputForm.addEventListener('submit', (e) => {
 
 // -- Start --
 
+phaseEl.textContent = 'Standing by';
 connect();

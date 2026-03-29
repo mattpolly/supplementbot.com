@@ -87,25 +87,36 @@
             </div>
         </section>
 
-        <section class="about-section about-limits">
-            <h2>Capacity limits</h2>
-            <p>SupplementBot runs on a single small server and calls commercial LLM APIs on every turn. Each full session costs real money in API fees. To keep the service available without requiring accounts or payment, sessions are capped:</p>
-            <div class="limits-grid">
-                <div class="limit-card">
-                    <span class="limit-num">5</span>
-                    <span class="limit-label">concurrent sessions</span>
-                </div>
-                <div class="limit-card">
-                    <span class="limit-num">13</span>
-                    <span class="limit-label">sessions per day</span>
-                </div>
-                <div class="limit-card">
-                    <span class="limit-num">400</span>
-                    <span class="limit-label">sessions per month</span>
+        <section class="about-section about-limits" id="capacity">
+            <div class="limits-hero">
+                <img src="bot.png" alt="SupplementBot mascot" class="limits-mascot">
+                <div class="limits-text">
+                    <h2>Capacity limits</h2>
+                    <p>Every session you have with SupplementBot costs real money in AI API fees — paid out of pocket by the developer as a service to a healthier community. There are no ads, no accounts, and no paywalls. To keep the lights on without going broke, sessions are capped:</p>
+                    <div class="limits-grid">
+                        <div class="limit-card">
+                            <span class="limit-num">5</span>
+                            <span class="limit-label">concurrent sessions</span>
+                        </div>
+                        <div class="limit-card">
+                            <span class="limit-num">13</span>
+                            <span class="limit-label">sessions per day</span>
+                        </div>
+                        <div class="limit-card">
+                            <span class="limit-num">400</span>
+                            <span class="limit-label">sessions per month</span>
+                        </div>
+                    </div>
+                    <p>If you hit a limit, sessions that are idle for 15 minutes free up automatically — try again shortly. If you'd like to help keep the service running, a $5 tip covers several sessions and goes directly toward API costs. Every bit helps.</p>
                 </div>
             </div>
-            <p>If you hit a limit, you'll see a message explaining why — not a generic error. Sessions that are idle for 15 minutes expire automatically to free capacity.</p>
-            <p>These numbers reflect what we can absorb in API costs while the project is in early development. They'll go up as the project matures.</p>
+            <div class="limits-stripe">
+                <script async src="https://js.stripe.com/v3/buy-button.js"></script>
+                <stripe-buy-button
+                    buy-button-id="buy_btn_1TGSfKBPb6BbiDhAg5iNzHie"
+                    publishable-key="pk_live_51TGREaBPb6BbiDhAraoyB5AECcX2pMSNjJ5GsBDpA8kOOJljAivQil7CBOOPVVL7HxpmArcJGsTwqNEZorev7cWp00NJZHFh98">
+                </stripe-buy-button>
+            </div>
         </section>
 
         <section class="about-disclaimer">

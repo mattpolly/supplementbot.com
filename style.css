@@ -278,6 +278,13 @@ a:hover {
     text-align: center;
     color: var(--text-muted);
     font-size: 15px;
+    line-height: 1.7;
+}
+
+#denied-block a {
+    color: var(--green);
+    font-weight: 600;
+    white-space: nowrap;
 }
 
 /* Input form */
@@ -489,15 +496,50 @@ a:hover {
     background: var(--white);
     border: 1px solid var(--border);
     border-radius: 12px;
-    padding: 28px 28px 24px;
+    padding: 28px;
 }
 
-.about-limits h2 {
+.limits-hero {
+    display: flex;
+    gap: 32px;
+    align-items: center;
+    margin-bottom: 28px;
+}
+
+.limits-mascot {
+    width: 200px;
+    flex-shrink: 0;
+    border-radius: 12px;
+}
+
+.limits-text h2 {
     margin-bottom: 12px;
 }
 
-.about-limits > p {
-    margin-bottom: 24px;
+.limits-text p {
+    margin-bottom: 16px;
+}
+
+.limits-text p:last-child {
+    margin-bottom: 0;
+}
+
+.limits-stripe {
+    border-top: 1px solid var(--border);
+    padding-top: 24px;
+    display: flex;
+    justify-content: center;
+}
+
+@media (max-width: 640px) {
+    .limits-hero {
+        flex-direction: column;
+    }
+
+    .limits-mascot {
+        width: 140px;
+        align-self: center;
+    }
 }
 
 .limits-grid {
