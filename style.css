@@ -26,6 +26,15 @@
     --danger-bg:    #ffebee;
 }
 
+html, body {
+    height: 100%;
+}
+
+/* Chat page: no scrollbar — widget fills exactly */
+html:not(.scrollable), html:not(.scrollable) body {
+    overflow: hidden;
+}
+
 html {
     font-size: 16px;
     -webkit-text-size-adjust: 100%;
@@ -36,6 +45,8 @@ body {
     background: var(--bg);
     color: var(--text);
     line-height: 1.6;
+    display: flex;
+    flex-direction: column;
 }
 
 a {
@@ -114,17 +125,19 @@ a:hover {
    ============================================================ */
 
 .chat-page {
+    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 32px 24px 24px;
-    min-height: calc(100vh - 52px - 49px);
+    padding: 24px;
+    overflow: hidden;
 }
 
 /* The chat widget */
 #app {
     width: 100%;
     max-width: 900px;
+    flex: 1;
     display: flex;
     flex-direction: column;
     background: var(--white);
@@ -132,8 +145,7 @@ a:hover {
     border-radius: 12px;
     box-shadow: 0 2px 12px rgba(0,0,0,0.07);
     overflow: hidden;
-    height: calc(100vh - 52px - 49px - 64px);
-    min-height: 480px;
+    min-height: 0;
 }
 
 #app-header {
