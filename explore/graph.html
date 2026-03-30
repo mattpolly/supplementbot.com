@@ -434,7 +434,6 @@
 
     // Initial load
     loadStats();
-    loadViz();
     </script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.30.2/cytoscape.min.js"></script>
@@ -651,6 +650,9 @@
             cy.nodes(`[type = "${type}"]`).connectedEdges().connectedNodes().removeClass('faded');
         }
     });
+
+    // Initial viz load
+    loadViz();
     </script>
 </body>
 </html>
