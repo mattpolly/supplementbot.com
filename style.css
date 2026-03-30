@@ -120,6 +120,12 @@ a:hover {
     color: rgba(255,255,255,0.8);
 }
 
+.footer-privacy {
+    margin-top: 4px;
+    font-size: 11px;
+    opacity: 0.5;
+}
+
 /* ============================================================
    Chat page layout
    ============================================================ */
@@ -507,7 +513,7 @@ a:hover {
 }
 
 .limits-mascot {
-    width: 200px;
+    width: 240px;
     flex-shrink: 0;
     border-radius: 12px;
 }

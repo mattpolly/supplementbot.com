@@ -14,11 +14,13 @@ const deniedMsg = document.getElementById('denied-message');
 let ws = null;
 let sessionId = null;
 
+const isDonor = new URLSearchParams(location.search).get('donor') === 'true';
+
 // -- WebSocket connection --
 
 function connect() {
     const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const url = `${protocol}//${location.host}/ws/chat`;
+    const url = `${protocol}//${location.host}/ws/chat${isDonor ? '?donor=true' : ''}`;
 
     ws = new WebSocket(url);
 
