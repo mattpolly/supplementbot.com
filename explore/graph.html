@@ -478,23 +478,49 @@
             return;
         }
 
-        // Normalise node IDs — SurrealDB returns {tb, id} objects
-        function nodeId(n) {
-            if (!n) return '';
-            if (typeof n === 'object' && n.tb) return n.id || `${n.tb}:${JSON.stringify(n.id)}`;
-            return String(n);
+        // Normalise a SurrealDB RecordId to a plain string.
+        // The API returns either:
+        //   {tb: "node", id: {String: "magnesium"}}   (nested key object)
+        //   {tb: "node", id: "magnesium"}              (plain string)
+        //   "node:magnesium"                           (already a string)
+        function recordIdStr(v) {
+            if (!v) return '';
+            if (typeof v === 'string') return v;
+            if (typeof v === 'object') {
+                // Extract the inner key from {tb, id}
+                const tb = v.tb || '';
+                let key = v.id;
+                if (key && typeof key === 'object') {
+                    // {String: "foo"} or {Number: 1} etc.
+                    key = Object.values(key)[0];
+                }
+                if (key !== undefined && key !== null) return String(key);
+                return tb || JSON.stringify(v);
+            }
+            return String(v);
         }
 
         const nodes = rawNodes.map(n => ({
-            id:   nodeId(n.id) || n.name,
-            name: n.name || nodeId(n.id),
-            type: n.node_type || 'Unknown',
+            id:   recordIdStr(n.id) || n.name,
+            name: n.name || recordIdStr(n.id),
+            type: typeof n.node_type === 'string' ? n.node_type
+                  : (n.node_type ? Object.values(n.node_type)[0] : 'Unknown'),
         }));
 
         const nodeSet = new Set(nodes.map(n => n.id));
         const edges = rawEdges
-            .map(e => ({ source: nodeId(e.source), target: nodeId(e.target), type: e.edge_type || '', speculative: false }))
+            .map(e => ({
+                source: recordIdStr(e.source),
+                target: recordIdStr(e.target),
+                type: typeof e.edge_type === 'string' ? e.edge_type
+                      : (e.edge_type ? Object.values(e.edge_type)[0] : ''),
+            }))
             .filter(e => e.source && e.target && nodeSet.has(e.source) && nodeSet.has(e.target));
+
+        // Log a sample so the raw shape is visible in DevTools if debugging is needed
+        if (rawNodes.length) console.log('[viz] sample node:', JSON.stringify(rawNodes[0]));
+        if (rawEdges.length) console.log('[viz] sample edge:', JSON.stringify(rawEdges[0]));
+        console.log('[viz] first node id resolved:', nodes[0]?.id, '| first edge:', edges[0]?.source, '->', edges[0]?.target);
 
         status.textContent = `${nodes.length} nodes · ${edges.length} edges`;
 
