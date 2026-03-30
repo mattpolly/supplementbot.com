@@ -49,6 +49,10 @@ function connect() {
 
 function handleServerMessage(msg) {
     switch (msg.type) {
+        case 'ready':
+            // Socket connected — session not created yet, waiting for first message
+            break;
+
         case 'welcome':
             sessionId = msg.session_id;
             if (msg.phase) updatePhase(msg.phase);
