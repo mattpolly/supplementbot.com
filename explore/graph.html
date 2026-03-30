@@ -43,22 +43,15 @@
         .tab-pane.active { display: block; }
 
         /* Graph visualization */
-        #viz-wrap { position: relative; }
-        #cy { width: 100%; height: 620px; border: 1px solid var(--border); border-radius: 8px; background: #fafafa; margin-top: 1rem; }
+        #viz-wrap { position: relative; border-radius: 8px; overflow: hidden; margin-top: 1rem; }
+        #viz-svg { width: 100%; height: 640px; background: #1a1a2e; display: block; border-radius: 8px; cursor: grab; }
+        #viz-svg:active { cursor: grabbing; }
         #viz-controls { display: flex; align-items: center; gap: 0.6rem; margin-top: 0.75rem; flex-wrap: wrap; }
         #viz-controls button { padding: 0.35rem 0.85rem; border: 1px solid var(--border); border-radius: 6px; background: var(--card-bg); color: var(--text); cursor: pointer; font-size: 0.82rem; }
         #viz-controls button:hover { border-color: var(--accent); color: var(--accent); }
         #viz-controls select { padding: 0.35rem 0.6rem; border: 1px solid var(--border); border-radius: 6px; font-size: 0.82rem; background: var(--card-bg); color: var(--text); }
         #viz-controls label { font-size: 0.82rem; color: var(--text-muted); }
         #viz-status { font-size: 0.8rem; color: var(--text-muted); margin-left: auto; }
-
-        #node-detail { position: absolute; top: 1rem; right: 1rem; width: 220px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; font-size: 0.82rem; display: none; z-index: 10; box-shadow: 0 2px 12px rgba(0,0,0,0.1); }
-        #node-detail h3 { margin: 0 0 0.5rem; font-size: 0.9rem; word-break: break-word; }
-        #node-detail .detail-row { display: flex; justify-content: space-between; gap: 0.5rem; padding: 0.2rem 0; border-bottom: 1px solid var(--border); }
-        #node-detail .detail-row:last-child { border-bottom: none; }
-        #node-detail .detail-label { color: var(--text-muted); flex-shrink: 0; }
-        #node-detail .detail-value { text-align: right; word-break: break-word; }
-        #node-detail-close { float: right; background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 1rem; margin: -0.25rem -0.25rem 0 0; padding: 0; }
 
         .legend { display: flex; flex-wrap: wrap; gap: 0.6rem 1.2rem; margin-top: 0.75rem; font-size: 0.78rem; }
         .legend-item { display: flex; align-items: center; gap: 0.35rem; }
@@ -102,33 +95,22 @@
         <div class="tab-pane active" id="tab-viz">
             <div id="viz-controls">
                 <button id="viz-fit">Fit all</button>
-                <button id="viz-zoom-in">＋ Zoom in</button>
-                <button id="viz-zoom-out">－ Zoom out</button>
-                <label>Layout:
-                    <select id="viz-layout">
-                        <option value="cose">Force-directed</option>
-                        <option value="breadthfirst">Breadth-first</option>
-                        <option value="circle">Circle</option>
-                        <option value="grid">Grid</option>
-                        <option value="concentric">Concentric</option>
-                    </select>
-                </label>
+                <button id="viz-zoom-in">＋</button>
+                <button id="viz-zoom-out">－</button>
                 <label>Filter type:
-                    <select id="viz-filter">
-                        <option value="">All nodes</option>
-                    </select>
+                    <select id="viz-filter"><option value="">All nodes</option></select>
                 </label>
                 <span id="viz-status">Loading…</span>
             </div>
             <div id="viz-wrap">
-                <div id="cy"></div>
-                <div id="node-detail">
-                    <button id="node-detail-close" title="Close">&times;</button>
-                    <h3 id="nd-name"></h3>
-                    <div class="detail-row"><span class="detail-label">Type</span><span class="detail-value" id="nd-type"></span></div>
-                    <div class="detail-row"><span class="detail-label">Connections</span><span class="detail-value" id="nd-degree"></span></div>
-                    <div class="detail-row"><span class="detail-label">ID</span><span class="detail-value" id="nd-id" style="font-size:0.72rem"></span></div>
-                </div>
+                <svg id="viz-svg">
+                    <defs>
+                        <marker id="arrow" viewBox="0 0 10 6" refX="26" refY="3" markerWidth="8" markerHeight="6" orient="auto-start-reverse">
+                            <path d="M0,0 L10,3 L0,6 Z" fill="#555"/>
+                        </marker>
+                    </defs>
+                    <g id="viz-g"></g>
+                </svg>
             </div>
             <div class="legend" id="viz-legend"></div>
         </div>
@@ -436,222 +418,229 @@
     loadStats();
     </script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.30.2/cytoscape.min.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
     <script>
     // ---------------------------------------------------------------------------
-    // Graph visualization with Cytoscape.js
+    // Graph visualization with D3 force-directed layout
     // ---------------------------------------------------------------------------
 
-    let cy = null;
     let vizLoaded = false;
-    let allElements = [];
+    let simulation = null;
+    let zoomBehavior = null;
 
-    // Node type → color
-    const NODE_COLORS = {
-        Supplement:  '#2e7d32',
-        Symptom:     '#1565c0',
-        Condition:   '#6a1b9a',
-        Mechanism:   '#e65100',
-        System:      '#00838f',
-        Drug:        '#c62828',
-        Nutrient:    '#558b2f',
-        Compound:    '#4527a0',
-        Enzyme:      '#f9a825',
-        Pathway:     '#37474f',
+    const COLOR_MAP = {
+        Ingredient: '#e74c3c',
+        Supplement: '#e74c3c',
+        System:     '#3498db',
+        Property:   '#9b59b6',
+        Mechanism:  '#2ecc71',
+        Symptom:    '#e67e22',
+        Condition:  '#e67e22',
+        Drug:       '#c0392b',
+        Nutrient:   '#27ae60',
+        Compound:   '#8e44ad',
+        Enzyme:     '#f39c12',
+        Pathway:    '#16a085',
     };
-    const DEFAULT_COLOR = '#546e7a';
+    const DEFAULT_COLOR = '#7f8c8d';
 
-    function nodeColor(type) {
-        return NODE_COLORS[type] || DEFAULT_COLOR;
-    }
+    const SIZE_MAP = {
+        Ingredient: 14, Supplement: 14,
+        System: 11,
+        Property: 9, Mechanism: 9,
+        Symptom: 8, Condition: 8,
+    };
+
+    function nodeColor(type) { return COLOR_MAP[type] || DEFAULT_COLOR; }
+    function nodeSize(type)  { return SIZE_MAP[type] || 9; }
 
     function buildLegend(nodeTypes) {
-        const legend = document.getElementById('viz-legend');
-        legend.innerHTML = [...nodeTypes].sort().map(t =>
-            `<div class="legend-item"><div class="legend-dot" style="background:${nodeColor(t)}"></div>${esc(t)}</div>`
+        document.getElementById('viz-legend').innerHTML = [...nodeTypes].sort().map(t =>
+            `<div class="legend-item"><div class="legend-dot" style="background:${nodeColor(t)}"></div>${t}</div>`
         ).join('');
     }
 
     async function loadViz() {
         if (vizLoaded) return;
         const status = document.getElementById('viz-status');
-        status.textContent = 'Loading nodes…';
+        status.textContent = 'Loading…';
 
-        // Fetch all nodes (graph is small — 66 nodes — load all)
-        let nodes = [], edges = [];
+        let rawNodes = [], rawEdges = [];
         try {
             const [nResp, eResp] = await Promise.all([
                 fetch('/api/explore/graph/nodes?limit=200&offset=0'),
                 fetch('/api/explore/graph/edges?limit=200&offset=0'),
             ]);
-            const nData = await nResp.json();
-            const eData = await eResp.json();
-            nodes = nData.rows || [];
-            edges = eData.rows || [];
+            rawNodes = (await nResp.json()).rows || [];
+            rawEdges = (await eResp.json()).rows || [];
         } catch (e) {
-            document.getElementById('viz-status').textContent = 'Load error: ' + e.message;
+            status.textContent = 'Load error: ' + e.message;
             return;
         }
 
-        status.textContent = `${nodes.length} nodes, ${edges.length} edges`;
+        // Normalise node IDs — SurrealDB returns {tb, id} objects
+        function nodeId(n) {
+            if (!n) return '';
+            if (typeof n === 'object' && n.tb) return n.id || `${n.tb}:${JSON.stringify(n.id)}`;
+            return String(n);
+        }
 
-        // Collect node types for legend + filter
-        const nodeTypes = new Set(nodes.map(n => n.node_type).filter(Boolean));
+        const nodes = rawNodes.map(n => ({
+            id:   nodeId(n.id) || n.name,
+            name: n.name || nodeId(n.id),
+            type: n.node_type || 'Unknown',
+        }));
+
+        const nodeSet = new Set(nodes.map(n => n.id));
+        const edges = rawEdges
+            .map(e => ({ source: nodeId(e.source), target: nodeId(e.target), type: e.edge_type || '', speculative: false }))
+            .filter(e => e.source && e.target && nodeSet.has(e.source) && nodeSet.has(e.target));
+
+        status.textContent = `${nodes.length} nodes · ${edges.length} edges`;
+
+        const nodeTypes = new Set(nodes.map(n => n.type));
         buildLegend(nodeTypes);
 
-        // Populate filter select
+        // Filter select
         const filterSel = document.getElementById('viz-filter');
         filterSel.innerHTML = '<option value="">All nodes</option>' +
-            [...nodeTypes].sort().map(t => `<option value="${esc(t)}">${esc(t)}</option>`).join('');
+            [...nodeTypes].sort().map(t => `<option value="${t}">${t}</option>`).join('');
 
-        // Build cytoscape elements
-        const nodeIdMap = {};
-        nodes.forEach(n => {
-            const key = n.id ? (typeof n.id === 'object' ? `${n.id.tb}:${n.id.id}` : String(n.id)) : n.name;
-            nodeIdMap[key] = true;
+        // SVG setup
+        const svgEl = document.getElementById('viz-svg');
+        const W = svgEl.clientWidth || 900;
+        const H = svgEl.clientHeight || 640;
+        const svg = d3.select('#viz-svg');
+        const g   = d3.select('#viz-g');
+
+        zoomBehavior = d3.zoom().scaleExtent([0.15, 6]).on('zoom', e => g.attr('transform', e.transform));
+        svg.call(zoomBehavior);
+
+        // Simulation
+        simulation = d3.forceSimulation(nodes)
+            .force('link', d3.forceLink(edges).id(d => d.id).distance(110))
+            .force('charge', d3.forceManyBody().strength(-420))
+            .force('center', d3.forceCenter(W / 2, H / 2))
+            .force('collision', d3.forceCollide().radius(d => nodeSize(d.type) + 14));
+
+        // Edges
+        const link = g.append('g').selectAll('line').data(edges).join('line')
+            .attr('stroke', '#555')
+            .attr('stroke-width', 1.5)
+            .attr('stroke-opacity', 0.7)
+            .attr('marker-end', 'url(#arrow)');
+
+        // Edge labels
+        const edgeLabel = g.append('g').selectAll('text').data(edges).join('text')
+            .attr('font-size', 9)
+            .attr('fill', '#666')
+            .attr('text-anchor', 'middle')
+            .attr('pointer-events', 'none')
+            .text(d => d.type);
+
+        // Nodes
+        const node = g.append('g').selectAll('circle').data(nodes).join('circle')
+            .attr('r', d => nodeSize(d.type))
+            .attr('fill', d => nodeColor(d.type))
+            .attr('stroke', '#fff')
+            .attr('stroke-width', 1.5)
+            .style('cursor', 'pointer')
+            .call(d3.drag()
+                .on('start', (e, d) => { if (!e.active) simulation.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; })
+                .on('drag',  (e, d) => { d.fx = e.x; d.fy = e.y; })
+                .on('end',   (e, d) => { if (!e.active) simulation.alphaTarget(0); d.fx = null; d.fy = null; }));
+
+        // Node labels
+        const label = g.append('g').selectAll('text').data(nodes).join('text')
+            .attr('font-size', 11)
+            .attr('fill', '#ddd')
+            .attr('text-anchor', 'middle')
+            .attr('pointer-events', 'none')
+            .attr('dy', d => nodeSize(d.type) + 13)
+            .text(d => d.name);
+
+        // Hover highlight
+        node.on('mouseover', (event, d) => {
+            const connected = new Set([d.id]);
+            edges.forEach(e => {
+                const sid = typeof e.source === 'object' ? e.source.id : e.source;
+                const tid = typeof e.target === 'object' ? e.target.id : e.target;
+                if (sid === d.id) connected.add(tid);
+                if (tid === d.id) connected.add(sid);
+            });
+            node.attr('opacity', n => connected.has(n.id) ? 1 : 0.12);
+            link.attr('opacity', e => {
+                const s = typeof e.source === 'object' ? e.source.id : e.source;
+                const t = typeof e.target === 'object' ? e.target.id : e.target;
+                return (s === d.id || t === d.id) ? 1 : 0.05;
+            });
+            label.attr('opacity', n => connected.has(n.id) ? 1 : 0.1);
+            edgeLabel.attr('opacity', e => {
+                const s = typeof e.source === 'object' ? e.source.id : e.source;
+                const t = typeof e.target === 'object' ? e.target.id : e.target;
+                return (s === d.id || t === d.id) ? 1 : 0.05;
+            });
+        }).on('mouseout', () => {
+            node.attr('opacity', 1);
+            link.attr('opacity', 0.7);
+            label.attr('opacity', 1);
+            edgeLabel.attr('opacity', 1);
         });
 
-        const cyNodes = nodes.map(n => {
-            const id = n.id ? (typeof n.id === 'object' ? `${n.id.tb}:${n.id.id}` : String(n.id)) : n.name;
-            return { data: { id, label: n.name || id, type: n.node_type || 'Unknown', rawId: id } };
+        // Tick
+        simulation.on('tick', () => {
+            link.attr('x1', d => d.source.x).attr('y1', d => d.source.y)
+                .attr('x2', d => d.target.x).attr('y2', d => d.target.y);
+            edgeLabel.attr('x', d => (d.source.x + d.target.x) / 2)
+                     .attr('y', d => (d.source.y + d.target.y) / 2);
+            node.attr('cx', d => d.x).attr('cy', d => d.y);
+            label.attr('x', d => d.x).attr('y', d => d.y);
         });
 
-        const cyEdges = edges.map((e, i) => {
-            const src = e.source ? (typeof e.source === 'object' ? `${e.source.tb}:${e.source.id}` : String(e.source)) : '';
-            const tgt = e.target ? (typeof e.target === 'object' ? `${e.target.tb}:${e.target.id}` : String(e.target)) : '';
-            return { data: { id: `e${i}`, source: src, target: tgt, label: e.edge_type || '' } };
-        }).filter(e => e.data.source && e.data.target);
-
-        allElements = [...cyNodes, ...cyEdges];
-
-        cy = cytoscape({
-            container: document.getElementById('cy'),
-            elements: allElements,
-            style: [
-                {
-                    selector: 'node',
-                    style: {
-                        'label': 'data(label)',
-                        'background-color': (ele) => nodeColor(ele.data('type')),
-                        'color': '#fff',
-                        'font-size': '10px',
-                        'text-valign': 'center',
-                        'text-halign': 'center',
-                        'width': 'label',
-                        'height': 'label',
-                        'padding': '6px',
-                        'shape': 'round-rectangle',
-                        'text-wrap': 'wrap',
-                        'text-max-width': '100px',
-                        'border-width': 0,
-                    }
-                },
-                {
-                    selector: 'node:selected',
-                    style: {
-                        'border-width': 3,
-                        'border-color': '#fff',
-                        'border-opacity': 0.9,
-                    }
-                },
-                {
-                    selector: 'edge',
-                    style: {
-                        'label': 'data(label)',
-                        'font-size': '8px',
-                        'color': '#666',
-                        'text-rotation': 'autorotate',
-                        'text-background-color': '#fafafa',
-                        'text-background-opacity': 0.7,
-                        'text-background-padding': '1px',
-                        'curve-style': 'bezier',
-                        'target-arrow-shape': 'triangle',
-                        'arrow-scale': 0.8,
-                        'line-color': '#b0bec5',
-                        'target-arrow-color': '#b0bec5',
-                        'width': 1.5,
-                    }
-                },
-                {
-                    selector: 'edge:selected',
-                    style: {
-                        'line-color': '#546e7a',
-                        'target-arrow-color': '#546e7a',
-                        'width': 2.5,
-                    }
-                },
-                {
-                    selector: '.faded',
-                    style: { 'opacity': 0.15 }
-                }
-            ],
-            layout: { name: 'cose', animate: false, randomize: false, nodeRepulsion: 8000, idealEdgeLength: 80 },
-            wheelSensitivity: 0.3,
-        });
-
-        // Click node → show detail panel
-        cy.on('tap', 'node', function(evt) {
-            const node = evt.target;
-            document.getElementById('nd-name').textContent = node.data('label');
-            document.getElementById('nd-type').textContent = node.data('type');
-            document.getElementById('nd-degree').textContent = node.degree();
-            document.getElementById('nd-id').textContent = node.data('rawId');
-            document.getElementById('node-detail').style.display = 'block';
-
-            // Highlight neighbors
-            cy.elements().addClass('faded');
-            node.removeClass('faded');
-            node.neighborhood().removeClass('faded');
-        });
-
-        // Click background → clear
-        cy.on('tap', function(evt) {
-            if (evt.target === cy) {
-                cy.elements().removeClass('faded');
-                document.getElementById('node-detail').style.display = 'none';
+        // Filter by type
+        document.getElementById('viz-filter').addEventListener('change', function() {
+            const type = this.value;
+            if (!type) {
+                node.attr('opacity', 1); link.attr('opacity', 0.7);
+                label.attr('opacity', 1); edgeLabel.attr('opacity', 1);
+            } else {
+                const visible = new Set(nodes.filter(n => n.type === type).map(n => n.id));
+                edges.forEach(e => {
+                    const s = typeof e.source === 'object' ? e.source.id : e.source;
+                    const t = typeof e.target === 'object' ? e.target.id : e.target;
+                    if (visible.has(s)) visible.add(t);
+                    if (visible.has(t)) visible.add(s);
+                });
+                node.attr('opacity', n => visible.has(n.id) ? 1 : 0.1);
+                link.attr('opacity', e => {
+                    const s = typeof e.source === 'object' ? e.source.id : e.source;
+                    return visible.has(s) ? 0.7 : 0.05;
+                });
+                label.attr('opacity', n => visible.has(n.id) ? 1 : 0.1);
+                edgeLabel.attr('opacity', e => {
+                    const s = typeof e.source === 'object' ? e.source.id : e.source;
+                    return visible.has(s) ? 1 : 0.05;
+                });
             }
         });
 
         vizLoaded = true;
     }
 
-    // Toolbar buttons
-    document.getElementById('viz-fit').addEventListener('click', () => cy && cy.fit(undefined, 40));
-    document.getElementById('viz-zoom-in').addEventListener('click', () => cy && cy.zoom({ level: cy.zoom() * 1.3, renderedPosition: { x: cy.width()/2, y: cy.height()/2 } }));
-    document.getElementById('viz-zoom-out').addEventListener('click', () => cy && cy.zoom({ level: cy.zoom() * 0.75, renderedPosition: { x: cy.width()/2, y: cy.height()/2 } }));
-    document.getElementById('node-detail-close').addEventListener('click', () => {
-        document.getElementById('node-detail').style.display = 'none';
-        cy && cy.elements().removeClass('faded');
+    // Toolbar
+    document.getElementById('viz-fit').addEventListener('click', () => {
+        const svgEl = document.getElementById('viz-svg');
+        d3.select('#viz-svg').transition().duration(400)
+            .call(zoomBehavior.transform, d3.zoomIdentity.translate(svgEl.clientWidth/2, svgEl.clientHeight/2).scale(0.8));
+    });
+    document.getElementById('viz-zoom-in').addEventListener('click', () => {
+        d3.select('#viz-svg').transition().duration(250).call(zoomBehavior.scaleBy, 1.4);
+    });
+    document.getElementById('viz-zoom-out').addEventListener('click', () => {
+        d3.select('#viz-svg').transition().duration(250).call(zoomBehavior.scaleBy, 0.7);
     });
 
-    // Layout switcher
-    document.getElementById('viz-layout').addEventListener('change', function() {
-        if (!cy) return;
-        const layouts = {
-            cose:         { name: 'cose', animate: true, randomize: false, nodeRepulsion: 8000, idealEdgeLength: 80 },
-            breadthfirst: { name: 'breadthfirst', animate: true, directed: true, padding: 20 },
-            circle:       { name: 'circle', animate: true, padding: 20 },
-            grid:         { name: 'grid', animate: true, padding: 20 },
-            concentric:   { name: 'concentric', animate: true, padding: 20, concentric: n => n.degree(), levelWidth: () => 2 },
-        };
-        cy.layout(layouts[this.value] || layouts.cose).run();
-    });
-
-    // Node type filter
-    document.getElementById('viz-filter').addEventListener('change', function() {
-        if (!cy) return;
-        const type = this.value;
-        if (!type) {
-            cy.elements().removeClass('faded');
-        } else {
-            cy.elements().addClass('faded');
-            cy.nodes(`[type = "${type}"]`).removeClass('faded');
-            cy.nodes(`[type = "${type}"]`).connectedEdges().removeClass('faded');
-            cy.nodes(`[type = "${type}"]`).connectedEdges().connectedNodes().removeClass('faded');
-        }
-    });
-
-    // Initial viz load
+    // Initial load
     loadViz();
     </script>
 </body>
