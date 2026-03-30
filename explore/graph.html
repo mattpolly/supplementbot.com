@@ -75,8 +75,6 @@
         <div class="stat-grid" id="stats-grid">
             <div class="stat-card"><div class="stat-label">Nodes</div><div class="stat-value" id="s-nodes">…</div></div>
             <div class="stat-card"><div class="stat-label">Edges</div><div class="stat-value" id="s-edges">…</div></div>
-            <div class="stat-card"><div class="stat-label">Aliases</div><div class="stat-value" id="s-node_aliases">…</div></div>
-            <div class="stat-card"><div class="stat-label">CUI Mappings</div><div class="stat-value" id="s-node_cuis">…</div></div>
             <div class="stat-card"><div class="stat-label">Edge Sources</div><div class="stat-value" id="s-edge_sources">…</div></div>
             <div class="stat-card"><div class="stat-label">Citations</div><div class="stat-value" id="s-edge_citations">…</div></div>
         </div>
@@ -85,8 +83,6 @@
             <button class="active" data-tab="viz">Visualize</button>
             <button data-tab="nodes">Nodes</button>
             <button data-tab="edges">Edges</button>
-            <button data-tab="aliases">Aliases</button>
-            <button data-tab="cuis">CUI Mappings</button>
             <button data-tab="edge-sources">Edge Sources</button>
             <button data-tab="edge-citations">Edge Citations</button>
         </div>
@@ -143,40 +139,6 @@
                 <div class="data-table-wrap">
                     <table id="edges-table">
                         <thead><tr><th>Source</th><th>Target</th><th>Type</th><th>Metadata</th></tr></thead>
-                        <tbody><tr class="loading-row"><td colspan="4">Select tab to load…</td></tr></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- Aliases -->
-        <div class="tab-pane" id="tab-aliases">
-            <div class="table-section">
-                <div class="controls">
-                    <button id="aliases-prev" disabled>← Prev</button>
-                    <span class="page-info" id="aliases-page-info"></span>
-                    <button id="aliases-next">Next →</button>
-                </div>
-                <div class="data-table-wrap">
-                    <table id="aliases-table">
-                        <thead><tr><th>Canonical</th><th>Alias</th><th>Confidence</th><th>Method</th></tr></thead>
-                        <tbody><tr class="loading-row"><td colspan="4">Select tab to load…</td></tr></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- CUIs -->
-        <div class="tab-pane" id="tab-cuis">
-            <div class="table-section">
-                <div class="controls">
-                    <button id="cuis-prev" disabled>← Prev</button>
-                    <span class="page-info" id="cuis-page-info"></span>
-                    <button id="cuis-next">Next →</button>
-                </div>
-                <div class="data-table-wrap">
-                    <table id="cuis-table">
-                        <thead><tr><th>Node Name</th><th>CUI</th><th>Confidence</th><th>Method</th></tr></thead>
                         <tbody><tr class="loading-row"><td colspan="4">Select tab to load…</td></tr></tbody>
                     </table>
                 </div>
@@ -253,34 +215,6 @@
                     <td>${escId(r.out)}</td>
                     <td>${esc(typeof r.edge_type === 'object' ? Object.keys(r.edge_type)[0] : r.edge_type)}</td>
                     <td><pre style="margin:0;font-size:0.75rem;white-space:pre-wrap">${esc(JSON.stringify(r.metadata, null, 2))}</pre></td>
-                </tr>`).join('');
-            },
-            cols: 4
-        },
-        aliases: {
-            url: '/api/explore/graph/node-aliases',
-            offset: 0,
-            loaded: false,
-            render(rows) {
-                return rows.map(r => `<tr>
-                    <td>${esc(r.canonical)}</td>
-                    <td>${esc(r.alias)}</td>
-                    <td>${fmt(r.confidence)}</td>
-                    <td>${esc(r.method)}</td>
-                </tr>`).join('');
-            },
-            cols: 4
-        },
-        cuis: {
-            url: '/api/explore/graph/node-cuis',
-            offset: 0,
-            loaded: false,
-            render(rows) {
-                return rows.map(r => `<tr>
-                    <td>${esc(r.node_name)}</td>
-                    <td>${esc(r.cui)}</td>
-                    <td>${fmt(r.confidence)}</td>
-                    <td>${esc(r.method)}</td>
                 </tr>`).join('');
             },
             cols: 4
