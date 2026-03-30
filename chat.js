@@ -50,7 +50,7 @@ function connect() {
 function handleServerMessage(msg) {
     switch (msg.type) {
         case 'ready':
-            // Socket connected — session not created yet, waiting for first message
+            enableInput();
             break;
 
         case 'welcome':
@@ -186,6 +186,7 @@ inputForm.addEventListener('submit', (e) => {
 // -- Start --
 
 phaseEl.textContent = 'Standing by';
+disableInput();
 
 if (isDonor) {
     const banner = document.getElementById('donor-banner');
