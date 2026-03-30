@@ -182,4 +182,13 @@ inputForm.addEventListener('submit', (e) => {
 // -- Start --
 
 phaseEl.textContent = 'Standing by';
+
+if (isDonor) {
+    const banner = document.getElementById('donor-banner');
+    banner.classList.remove('hidden');
+    document.getElementById('donor-banner-close').addEventListener('click', () => {
+        banner.classList.add('hidden');
+    });
+}
+
 connect();

@@ -120,6 +120,35 @@ a:hover {
     color: rgba(255,255,255,0.8);
 }
 
+/* Donor thank-you banner */
+#donor-banner {
+    background: var(--green-mid);
+    color: #fff;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    animation: fadeIn 0.4s ease;
+}
+
+#donor-banner-close {
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.8);
+    font-size: 20px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0 4px;
+    margin-left: auto;
+}
+
+#donor-banner-close:hover {
+    color: #fff;
+}
+
 .footer-privacy {
     margin-top: 4px;
     font-size: 11px;
