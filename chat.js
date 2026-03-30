@@ -10,6 +10,8 @@ const phaseEl = document.getElementById('phase-indicator');
 const emergencyEl = document.getElementById('emergency-block');
 const deniedEl = document.getElementById('denied-block');
 const deniedMsg = document.getElementById('denied-message');
+const citationsPanel = document.getElementById('citations-panel');
+const citationsList = document.getElementById('citations-list');
 
 let ws = null;
 let sessionId = null;
@@ -66,6 +68,9 @@ function handleServerMessage(msg) {
             hideTyping();
             addAgentMessage(msg.text);
             if (msg.phase) updatePhase(msg.phase);
+            if (msg.citations && msg.citations.length > 0) {
+                showCitations(msg.citations);
+            }
             if (msg.complete) {
                 disableInput();
                 addSystemMessage('Session complete. Thank you for using SupplementBot.');
@@ -182,6 +187,53 @@ inputForm.addEventListener('submit', (e) => {
     ws.send(JSON.stringify({ type: 'message', text }));
     userInput.value = '';
 });
+
+// -- Citations --
+
+function showCitations(citations) {
+    citationsList.innerHTML = '';
+
+    // Group by ingredient
+    const byIngredient = {};
+    for (const c of citations) {
+        if (!byIngredient[c.ingredient]) byIngredient[c.ingredient] = [];
+        byIngredient[c.ingredient].push(c);
+    }
+
+    for (const [ingredient, cites] of Object.entries(byIngredient)) {
+        const group = document.createElement('div');
+        group.className = 'citation-group';
+
+        const heading = document.createElement('h3');
+        heading.textContent = ingredient;
+        group.appendChild(heading);
+
+        for (const cite of cites) {
+            const item = document.createElement('div');
+            item.className = 'citation-item';
+
+            const sentence = document.createElement('p');
+            sentence.className = 'citation-sentence';
+            sentence.textContent = cite.sentence;
+
+            const link = document.createElement('a');
+            link.href = cite.url;
+            link.target = '_blank';
+            link.rel = 'noopener';
+            link.className = 'citation-link';
+            link.textContent = `PMID ${cite.pmid}`;
+
+            item.appendChild(sentence);
+            item.appendChild(link);
+            group.appendChild(item);
+        }
+
+        citationsList.appendChild(group);
+    }
+
+    citationsPanel.classList.remove('hidden');
+    document.getElementById('chat-layout').classList.add('with-citations');
+}
 
 // -- Start --
 
