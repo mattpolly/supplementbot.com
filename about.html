@@ -30,7 +30,8 @@
                     <h3>Knowledge graph</h3>
                     <p>Before any conversation begins, a separate NSAI loop teaches the system about supplements. It queries multiple LLMs (Anthropic, Google Gemini, xAI Grok), extracts typed triples, and assembles them into a persistent graph stored in SurrealDB.</p>
                     <p>The graph has 14 node types and 19 edge types across three complexity tiers — from foundational (body systems, symptoms) to graduate-level (gene targets, receptors, metabolites). A continuous <strong>complexity lens</strong> controls which parts of the graph are visible, so explanations scale to what's useful, not what's technically complete.</p>
-                    <p>Knowledge comes from <strong>iDISK 2.0</strong> — 392 symptoms, 7,876 ingredients, 214 drugs — cross-validated with SuppKG. Every extracted edge carries a confidence score, a source quality tier (single-provider → multi-provider → citation-backed), and a reasoning depth. Weak edges decay over time. Edges confirmed by multiple independent providers are boosted.</p>
+                    <p>Knowledge comes from <strong>iDISK 2.0</strong> — 392 symptoms, 7,876 ingredients, 214 drugs — cross-validated with <strong>SuppKG</strong> (570,000 literature-extracted edges linking dietary compounds to clinical concepts). Every extracted edge carries a confidence score, a source quality tier (single-provider → multi-provider → citation-backed), and a reasoning depth. Weak edges decay over time. Edges confirmed by multiple independent providers are boosted.</p>
+                    <p>Graph edges are backed by citations pulled from SuppKG's PubMed-derived corpus. Each ingredient maps to its most citation-rich concept in the knowledge graph — so when the system says magnesium affects the muscular system, there are actual sentences from the literature behind it.</p>
                 </div>
                 <div class="col-card">
                     <h3>Intake conversation</h3>
@@ -44,6 +45,7 @@
                         <li><strong>Recommendation</strong> — ranked supplements with evidence and safety caveats</li>
                     </ol>
                     <p>Each question is chosen by <strong>Expected Information Gain</strong> scoring against the current candidate set. The system doesn't ask the same question twice, and it won't ask about a body system you've already addressed.</p>
+                    <p>The system shows its thinking as it goes — once it has enough context to form early candidates, it tells you what it's considering before asking the next question. You're not left wondering what it's doing.</p>
                 </div>
             </div>
         </section>
