@@ -68,7 +68,7 @@ a:hover {
     height: 52px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
     width: 100%;
 }
 
@@ -88,6 +88,7 @@ a:hover {
 .nav-links {
     display: flex;
     gap: 24px;
+    margin-left: auto;
 }
 
 .nav-links a {
@@ -275,7 +276,7 @@ a:hover {
 }
 
 #construction-badge {
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
