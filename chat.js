@@ -6,7 +6,6 @@ const typingEl = document.getElementById('typing-indicator');
 const inputForm = document.getElementById('input-form');
 const userInput = document.getElementById('user-input');
 const sendBtn = document.getElementById('send-btn');
-const phaseEl = document.getElementById('phase-indicator');
 const emergencyEl = document.getElementById('emergency-block');
 const deniedEl = document.getElementById('denied-block');
 const deniedMsg = document.getElementById('denied-message');
@@ -57,7 +56,6 @@ function handleServerMessage(msg) {
 
         case 'welcome':
             sessionId = msg.session_id;
-            if (msg.phase) updatePhase(msg.phase);
             break;
 
         case 'typing':
@@ -67,7 +65,6 @@ function handleServerMessage(msg) {
         case 'response':
             hideTyping();
             addAgentMessage(msg.text);
-            if (msg.phase) updatePhase(msg.phase);
             if (msg.citations && msg.citations.length > 0) {
                 showCitations(msg.citations);
             }
@@ -134,28 +131,6 @@ function showTyping() {
 
 function hideTyping() {
     typingEl.classList.add('hidden');
-}
-
-const PHASES = [
-    { key: 'chief_complaint',   label: 'Chief Complaint' },
-    { key: 'hpi',               label: 'History' },
-    { key: 'review_of_systems', label: 'Review of Systems' },
-    { key: 'differentiation',   label: 'Narrowing Down' },
-    { key: 'causation_inquiry', label: 'Causation Check' },
-    { key: 'recommendation',    label: 'Recommendations' },
-];
-
-function updatePhase(phase) {
-    if (phase === 'emergency') {
-        phaseEl.textContent = 'Emergency';
-        return;
-    }
-    const idx = PHASES.findIndex(p => p.key === phase);
-    if (idx === -1) {
-        phaseEl.textContent = phase;
-        return;
-    }
-    phaseEl.textContent = `Step ${idx + 1} of ${PHASES.length} — ${PHASES[idx].label}`;
 }
 
 function scrollToBottom() {
@@ -237,7 +212,6 @@ function showCitations(citations) {
 
 // -- Start --
 
-phaseEl.textContent = 'Standing by';
 disableInput();
 
 if (isDonor) {
