@@ -276,7 +276,7 @@ a:hover {
 }
 
 #construction-badge {
-    font-size: 12px;
+    font-size: 10px;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -284,7 +284,11 @@ a:hover {
     background: var(--white);
     padding: 3px 8px;
     border-radius: 4px;
-    margin-left: 10px;
+    margin-left: 18px;
+}
+
+#construction-badge .badge-icon {
+    font-size: 14px;
 }
 
 /* Disclaimer banner */
