@@ -275,14 +275,15 @@ a:hover {
 }
 
 #construction-badge {
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     color: var(--green);
     background: var(--white);
-    padding: 3px 10px;
-    border-radius: 10px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    margin-left: 10px;
 }
 
 /* Disclaimer banner */
