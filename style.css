@@ -66,10 +66,14 @@ a:hover {
     background: var(--green);
     padding: 0 24px;
     height: 52px;
+    min-height: 52px;
+    max-height: 52px;
     display: flex;
     align-items: center;
     justify-content: flex-start;
     width: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
 }
 
 .nav-brand {
