@@ -315,6 +315,11 @@ a:hover {
     padding: 16px;
     display: flex;
     flex-direction: column;
+}
+
+#messages {
+    display: flex;
+    flex-direction: column;
     gap: 10px;
 }
 
