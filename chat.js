@@ -11,6 +11,8 @@ const deniedEl = document.getElementById('denied-block');
 const deniedMsg = document.getElementById('denied-message');
 const citationsPanel = document.getElementById('citations-panel');
 const citationsList = document.getElementById('citations-list');
+const debugPanel = document.getElementById('debug-panel');
+const debugTurns = document.getElementById('debug-turns');
 
 let ws = null;
 let sessionId = null;
@@ -67,6 +69,9 @@ function handleServerMessage(msg) {
             addAgentMessage(msg.text);
             if (msg.citations && msg.citations.length > 0) {
                 showCitations(msg.citations);
+            }
+            if (msg.debug_llm_prompt) {
+                showDebugPrompt(msg.debug_llm_prompt);
             }
             if (msg.complete) {
                 disableInput();
@@ -208,6 +213,27 @@ function showCitations(citations) {
 
     citationsPanel.classList.remove('hidden');
     document.getElementById('chat-layout').classList.add('with-citations');
+}
+
+// -- Debug prompt panel --
+
+function showDebugPrompt(prompt) {
+    const turnNum = debugTurns.children.length + 1;
+    const block = document.createElement('div');
+    block.className = 'debug-turn';
+
+    const heading = document.createElement('h3');
+    heading.textContent = `Turn ${turnNum}`;
+    block.appendChild(heading);
+
+    const pre = document.createElement('pre');
+    pre.className = 'debug-prompt-text';
+    pre.textContent = prompt;
+    block.appendChild(pre);
+
+    debugTurns.appendChild(block);
+    debugPanel.classList.remove('hidden');
+    document.getElementById('chat-layout').classList.add('with-debug');
 }
 
 // -- Start --

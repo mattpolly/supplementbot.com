@@ -186,6 +186,51 @@ a:hover {
     justify-content: stretch;
 }
 
+/* Debug prompt panel (left) */
+#debug-panel {
+    width: 360px;
+    flex-shrink: 0;
+    background: #1e1e2e;
+    color: #cdd6f4;
+    border-radius: 12px;
+    padding: 20px;
+    overflow-y: auto;
+    font-family: monospace;
+    font-size: 11px;
+    animation: fadeIn 0.3s ease;
+    order: -1;
+}
+
+#debug-panel h2 {
+    font-size: 13px;
+    font-weight: 700;
+    color: #a6e3a1;
+    margin-bottom: 12px;
+}
+
+.debug-turn {
+    margin-bottom: 20px;
+    border-top: 1px solid #45475a;
+    padding-top: 10px;
+}
+
+.debug-turn h3 {
+    font-size: 11px;
+    color: #89b4fa;
+    margin-bottom: 6px;
+}
+
+.debug-prompt-text {
+    white-space: pre-wrap;
+    word-break: break-word;
+    line-height: 1.5;
+    color: #cdd6f4;
+}
+
+#chat-layout.with-debug {
+    justify-content: stretch;
+}
+
 /* Citations panel */
 #citations-panel {
     width: 320px;
