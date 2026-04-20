@@ -173,14 +173,19 @@ inputForm.addEventListener('submit', (e) => {
 function showCitations(citations) {
     citationsList.innerHTML = '';
 
-    // Group by ingredient
+    // Group by ingredient, preserving order of first appearance
+    const order = [];
     const byIngredient = {};
     for (const c of citations) {
-        if (!byIngredient[c.ingredient]) byIngredient[c.ingredient] = [];
+        if (!byIngredient[c.ingredient]) {
+            byIngredient[c.ingredient] = [];
+            order.push(c.ingredient);
+        }
         byIngredient[c.ingredient].push(c);
     }
 
-    for (const [ingredient, cites] of Object.entries(byIngredient)) {
+    for (const ingredient of order) {
+        const cites = byIngredient[ingredient];
         const group = document.createElement('div');
         group.className = 'citation-group';
 
@@ -188,24 +193,29 @@ function showCitations(citations) {
         heading.textContent = ingredient;
         group.appendChild(heading);
 
-        for (const cite of cites) {
-            const item = document.createElement('div');
-            item.className = 'citation-item';
+        // Always show the first (highest-confidence) citation
+        group.appendChild(makeCitationItem(cites[0]));
 
-            const sentence = document.createElement('p');
-            sentence.className = 'citation-sentence';
-            sentence.textContent = cite.sentence;
+        // If there are more, add a collapsible section
+        if (cites.length > 1) {
+            const extras = document.createElement('div');
+            extras.className = 'citation-extras hidden';
+            for (const cite of cites.slice(1)) {
+                extras.appendChild(makeCitationItem(cite));
+            }
 
-            const link = document.createElement('a');
-            link.href = cite.url;
-            link.target = '_blank';
-            link.rel = 'noopener';
-            link.className = 'citation-link';
-            link.textContent = `PMID ${cite.pmid}`;
+            const toggle = document.createElement('button');
+            toggle.className = 'citation-toggle';
+            toggle.textContent = `Show ${cites.length - 1} more`;
+            toggle.addEventListener('click', () => {
+                const collapsed = extras.classList.toggle('hidden');
+                toggle.textContent = collapsed
+                    ? `Show ${cites.length - 1} more`
+                    : 'Show less';
+            });
 
-            item.appendChild(sentence);
-            item.appendChild(link);
-            group.appendChild(item);
+            group.appendChild(extras);
+            group.appendChild(toggle);
         }
 
         citationsList.appendChild(group);
@@ -213,6 +223,26 @@ function showCitations(citations) {
 
     citationsPanel.classList.remove('hidden');
     document.getElementById('chat-layout').classList.add('with-citations');
+}
+
+function makeCitationItem(cite) {
+    const item = document.createElement('div');
+    item.className = 'citation-item';
+
+    const sentence = document.createElement('p');
+    sentence.className = 'citation-sentence';
+    sentence.textContent = cite.sentence;
+
+    const link = document.createElement('a');
+    link.href = cite.url;
+    link.target = '_blank';
+    link.rel = 'noopener';
+    link.className = 'citation-link';
+    link.textContent = `PMID ${cite.pmid}`;
+
+    item.appendChild(sentence);
+    item.appendChild(link);
+    return item;
 }
 
 // -- Debug prompt panel --
