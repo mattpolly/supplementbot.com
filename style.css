@@ -173,20 +173,21 @@ a:hover {
     overflow: hidden;
 }
 
-/* Two-column wrapper — chat stays centered, citations panel sits alongside */
+/* Two-column wrapper — chat stays centered, citations float right */
 #chat-layout {
     flex: 1;
-    display: flex;
-    gap: 20px;
+    display: grid;
+    grid-template-columns: 1fr minmax(0, 900px) 1fr;
+    gap: 0;
     min-height: 0;
-    justify-content: center;
-    position: relative;
 }
 
-/* Debug prompt panel (left) */
+/* Debug prompt panel (left column) */
 #debug-panel {
+    grid-column: 1;
+    justify-self: end;
     width: 360px;
-    flex-shrink: 0;
+    margin-right: 20px;
     background: #1e1e2e;
     color: #cdd6f4;
     border-radius: 12px;
@@ -195,7 +196,6 @@ a:hover {
     font-family: monospace;
     font-size: 11px;
     animation: fadeIn 0.3s ease;
-    order: -1;
 }
 
 #debug-panel h2 {
@@ -224,24 +224,21 @@ a:hover {
     color: #cdd6f4;
 }
 
-#chat-layout.with-debug {
-    justify-content: stretch;
-}
+/* with-debug and with-citations classes kept for JS hooks but grid handles layout */
 
-/* Citations panel — positioned so it doesn't shift the chat */
+/* Citations panel — right column, doesn't shift the chat */
 #citations-panel {
-    position: absolute;
-    right: 0;
-    top: 0;
+    grid-column: 3;
     width: 320px;
     max-height: 100%;
     background: var(--white);
     border: 1px solid var(--border);
     border-radius: 12px;
     padding: 20px;
+    margin-left: 20px;
     overflow-y: auto;
     animation: fadeIn 0.3s ease;
-    align-self: flex-start;
+    align-self: start;
 }
 
 #citations-panel h2 {
@@ -321,11 +318,10 @@ a:hover {
     }
 }
 
-/* The chat widget */
+/* The chat widget — always in the center grid column */
 #app {
+    grid-column: 2;
     width: 100%;
-    max-width: 900px;
-    flex: 1;
     display: flex;
     flex-direction: column;
     background: var(--white);
