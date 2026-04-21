@@ -183,7 +183,7 @@ a:hover {
 }
 
 #chat-layout.with-citations {
-    justify-content: stretch;
+    justify-content: center;
 }
 
 /* Debug prompt panel (left) */
