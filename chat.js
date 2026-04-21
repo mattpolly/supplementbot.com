@@ -170,9 +170,10 @@ inputForm.addEventListener('submit', (e) => {
 
 // -- Citations --
 
-function showCitations(citations) {
-    citationsList.innerHTML = '';
+// Track which ingredients already have citation groups in the panel
+const shownIngredients = new Set();
 
+function showCitations(citations) {
     // Group by ingredient, preserving order of first appearance
     const order = [];
     const byIngredient = {};
@@ -185,6 +186,10 @@ function showCitations(citations) {
     }
 
     for (const ingredient of order) {
+        // Skip ingredients we've already shown
+        if (shownIngredients.has(ingredient)) continue;
+        shownIngredients.add(ingredient);
+
         const cites = byIngredient[ingredient];
         const group = document.createElement('div');
         group.className = 'citation-group';
@@ -193,7 +198,7 @@ function showCitations(citations) {
         heading.textContent = ingredient;
         group.appendChild(heading);
 
-        // Always show the first (highest-confidence) citation
+        // Always show the first (highest-relevance) citation
         group.appendChild(makeCitationItem(cites[0]));
 
         // If there are more, add a collapsible section
@@ -223,6 +228,9 @@ function showCitations(citations) {
 
     citationsPanel.classList.remove('hidden');
     document.getElementById('chat-layout').classList.add('with-citations');
+
+    // Auto-scroll citations panel to show the newest addition
+    citationsPanel.scrollTop = citationsPanel.scrollHeight;
 }
 
 function makeCitationItem(cite) {

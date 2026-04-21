@@ -173,17 +173,14 @@ a:hover {
     overflow: hidden;
 }
 
-/* Two-column wrapper — single column by default, expands when citations arrive */
+/* Two-column wrapper — chat stays centered, citations panel sits alongside */
 #chat-layout {
     flex: 1;
     display: flex;
     gap: 20px;
     min-height: 0;
     justify-content: center;
-}
-
-#chat-layout.with-citations {
-    justify-content: center;
+    position: relative;
 }
 
 /* Debug prompt panel (left) */
@@ -231,16 +228,20 @@ a:hover {
     justify-content: stretch;
 }
 
-/* Citations panel */
+/* Citations panel — positioned so it doesn't shift the chat */
 #citations-panel {
+    position: absolute;
+    right: 0;
+    top: 0;
     width: 320px;
-    flex-shrink: 0;
+    max-height: 100%;
     background: var(--white);
     border: 1px solid var(--border);
     border-radius: 12px;
     padding: 20px;
     overflow-y: auto;
     animation: fadeIn 0.3s ease;
+    align-self: flex-start;
 }
 
 #citations-panel h2 {
