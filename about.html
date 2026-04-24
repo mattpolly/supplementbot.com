@@ -30,22 +30,24 @@
                 <div class="col-card">
                     <h3>Knowledge graph</h3>
                     <p>Before any conversation begins, a separate NSAI loop teaches the system about supplements. It queries multiple LLMs (Anthropic, Google Gemini, xAI Grok), extracts typed triples, and assembles them into a persistent graph stored in SurrealDB.</p>
-                    <p>The graph has 14 node types and 19 edge types across three complexity tiers — from foundational (body systems, symptoms) to graduate-level (gene targets, receptors, metabolites). A continuous <strong>complexity lens</strong> controls which parts of the graph are visible, so explanations scale to what's useful, not what's technically complete.</p>
-                    <p>Knowledge comes from <strong>iDISK 2.0</strong> — 392 symptoms, 7,876 ingredients, 214 drugs — cross-validated with <strong>SuppKG</strong> (570,000 literature-extracted edges linking dietary compounds to clinical concepts). Every extracted edge carries a confidence score, a source quality tier (single-provider → multi-provider → citation-backed), and a reasoning depth. Weak edges decay over time. Edges confirmed by multiple independent providers are boosted.</p>
+                    <p>The graph spans multiple complexity tiers — from foundational (body systems, symptoms) to graduate-level (gene targets, receptors, metabolites). A continuous <strong>complexity lens</strong> controls which parts of the graph are visible, so explanations scale to what's useful, not what's technically complete.</p>
+                    <p>Knowledge is sourced from <strong>iDISK 2.0</strong> (ingredients, drugs, adverse reactions, condition associations), <strong>SuppKG</strong> (literature-extracted edges linking dietary compounds to clinical concepts with PubMed citations), <strong>CTD</strong> (Comparative Toxicogenomics Database — chemical-disease interactions and MESH-mapped synonyms), <strong>DSLD</strong> (NIH Dietary Supplement Label Database — real product ingredient names across tens of thousands of commercial labels), <strong>PubChem</strong>, <strong>UMLS</strong>, and PubMed E-utilities. All of these are unified in <strong>Supplementology</strong>, a structured knowledge base purpose-built for this project. Every extracted edge carries a confidence score, a source quality tier (single-provider → multi-provider → citation-backed), and a reasoning depth. Weak edges decay over time. Edges confirmed by multiple independent providers are boosted.</p>
                     <p>Graph edges are backed by citations pulled from SuppKG's PubMed-derived corpus. Each ingredient maps to its most citation-rich concept in the knowledge graph — so when the system says magnesium affects the muscular system, there are actual sentences from the literature behind it.</p>
                 </div>
                 <div class="col-card">
                     <h3>Intake conversation</h3>
-                    <p>The conversation is a structured clinical interview — not a chatbot. It moves through six phases driven by an <strong>intake knowledge graph</strong> (process knowledge separate from supplement facts):</p>
+                    <p>The conversation is a structured clinical interview — not a chatbot. It moves through eight phases driven by an <strong>intake knowledge graph</strong> (process knowledge separate from supplement facts):</p>
                     <ol class="phase-list">
                         <li><strong>Chief Complaint</strong> — what brought you here</li>
                         <li><strong>HPI</strong> — onset, location, duration, character, severity (OLDCARTS framework)</li>
-                        <li><strong>Review of Systems</strong> — adjacent body systems</li>
-                        <li><strong>Differentiation</strong> — discriminating between top candidates</li>
-                        <li><strong>Causation Inquiry</strong> — checking current supplements for adverse reactions</li>
+                        <li><strong>Review of Systems</strong> — symptoms across body systems connected to current candidates</li>
+                        <li><strong>Differentiation</strong> — questions chosen to split the candidate set as evenly as possible</li>
+                        <li><strong>Causation Inquiry</strong> — checking whether your current supplements may be causing your symptoms</li>
+                        <li><strong>Safety</strong> — current medications and pre-existing conditions before any supplement is named</li>
                         <li><strong>Recommendation</strong> — ranked supplements with evidence and safety caveats</li>
+                        <li><strong>Follow-up</strong> — clarifying questions after the recommendation is delivered</li>
                     </ol>
-                    <p>Each question is chosen by <strong>Expected Information Gain</strong> scoring against the current candidate set. The system doesn't ask the same question twice, and it won't ask about a body system you've already addressed.</p>
+                    <p>Each differentiating question is chosen by entropy scoring — the question most likely to split the remaining candidates is asked first. The system tracks which questions it has already asked and which body systems have already been covered, so it doesn't double back.</p>
                     <p>The system shows its thinking as it goes — once it has enough context to form early candidates, it tells you what it's considering before asking the next question. You're not left wondering what it's doing.</p>
                 </div>
             </div>
@@ -86,7 +88,7 @@
                     <span class="step-num">5</span>
                     <div>
                         <strong>Post-generation safety filter</strong>
-                        <p>Every response is checked before it reaches you. Responses containing diagnostic language, cure claims, or medical advice are rewritten or blocked. This filter runs on every turn, independent of the LLM.</p>
+                        <p>Every response is checked before it reaches you. Responses containing diagnostic language, cure claims, or dosage prescriptions are rewritten or blocked. A second check scans for any supplement name not in our knowledge graph — if the model mentions an ingredient we haven't researched, the response is blocked before it reaches you. This filter runs on every turn, independent of the LLM.</p>
                     </div>
                 </div>
             </div>

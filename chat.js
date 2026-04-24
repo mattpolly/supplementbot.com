@@ -154,6 +154,23 @@ function enableInput() {
     userInput.focus();
 }
 
+// -- Auto-resize textarea --
+
+function resizeInput() {
+    userInput.style.height = 'auto';
+    userInput.style.height = Math.min(userInput.scrollHeight, 160) + 'px';
+}
+
+userInput.addEventListener('input', resizeInput);
+
+// Enter submits; Shift+Enter inserts a newline.
+userInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        inputForm.requestSubmit();
+    }
+});
+
 // -- Send message --
 
 inputForm.addEventListener('submit', (e) => {
@@ -166,6 +183,7 @@ inputForm.addEventListener('submit', (e) => {
 
     ws.send(JSON.stringify({ type: 'message', text }));
     userInput.value = '';
+    userInput.style.height = 'auto';
 });
 
 // -- Citations --
